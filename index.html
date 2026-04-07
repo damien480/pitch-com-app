@@ -1,23 +1,67 @@
-html
-!DOCTYPE html
-html lang=en
-head
-    meta charset=UTF-8
-    meta name=viewport content=width=device-width, initial-scale=1.0
-    titlePitch Com Apptitle
-    style
-         PASTE ALL THE CSS CODE YOU SENT ME HERE 
-    style
-head
-body
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Pitch Com App</title>
+    <style>
+        /* Your CSS Styles */
+        * { box-sizing: border-box; margin: 0; padding: 0; }
+        body { font-family: sans-serif; background: #0a0f1a; color: #e8eaf0; }
+        .app {
+            max-width: 420px;
+            margin: 20px auto;
+            background: #0a0f1a;
+            min-height: 90vh;
+            display: flex;
+            flex-direction: column;
+            border-radius: 16px;
+            overflow: hidden;
+            border: 1px solid #1e2a3a;
+        }
+        .topbar { background: #0d1520; padding: 14px 16px; border-bottom: 1px solid #1e2a3a; display: flex; justify-content: space-between; }
+        .topbar-title { font-size: 17px; font-weight: 500; color: #ffffff; }
+        .bt-badge { background: #0f2540; border: 1px solid #1a4a7a; border-radius: 20px; padding: 4px 10px; font-size: 11px; color: #5ab0ff; }
+        .panel { padding: 20px; }
+        .section-label { font-size: 10px; letter-spacing: 0.12em; text-transform: uppercase; color: #4a5a6a; margin-bottom: 10px; }
+        .pitch-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; margin-bottom: 20px; }
+        .pitch-btn { padding: 15px 5px; background: #0f1a28; border: 1.5px solid #1e2a3a; border-radius: 10px; color: #c8d4e0; cursor: pointer; }
+        .fire-btn { width: 100%; padding: 16px; background: #1a3a5c; border: 1.5px solid #2a5a8a; border-radius: 12px; color: #5ab0ff; font-weight: bold; cursor: pointer; }
+    </style>
+</head>
+<body>
+    <div class="app">
+        <div class="topbar">
+            <span class="topbar-title">PITCH COM</span>
+            <div class="bt-badge">DISCONNECTED</div>
+        </div>
+        <div class="panel">
+            <h2 class="section-label">Select Pitch</h2>
+            <div class="pitch-grid">
+                <button class="pitch-btn">Fastball</button>
+                <button class="pitch-btn">Curve</button>
+                <button class="pitch-btn">Slider</button>
+                <button class="pitch-btn">Change</button>
+                <button class="pitch-btn">Sinker</button>
+                <button class="pitch-btn">Cutter</button>
+            </div>
+            <button class="fire-btn">FIRE PITCH</button>
+        </div>
+    </div>
 
-    !-- YOU NEED TO ADD YOUR HTML CONTENT HERE --
-    div class=app
-        !-- Add the actual buttons and panels for your app here --
-    div
+    <script>
+        // Simple interactivity
+        const buttons = document.querySelectorAll('.pitch-btn');
+        buttons.forEach(btn => {
+            btn.addEventListener('click', () => {
+                buttons.forEach(b => b.style.borderColor = '#1e2a3a');
+                btn.style.borderColor = '#5ab0ff';
+            });
+        });
 
-    script
-         IF YOU HAVE JAVASCRIPT CODE, PUT IT HERE 
-    script
-body
-html
+        document.querySelector('.fire-btn').addEventListener('click', () => {
+            alert('Pitch Signal Fired!');
+        });
+    </script>
+</body>
+</html>
