@@ -1,0 +1,690 @@
+
+<style>
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body { font-family: var(--font-sans); }
+
+  .app {
+    max-width: 420px;
+    margin: 0 auto;
+    background: #0a0f1a;
+    min-height: 100vh;
+    color: #e8eaf0;
+    display: flex;
+    flex-direction: column;
+    border-radius: 16px;
+    overflow: hidden;
+    border: 1px solid #1e2a3a;
+  }
+
+  .topbar {
+    background: #0d1520;
+    padding: 14px 16px 12px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    border-bottom: 1px solid #1e2a3a;
+  }
+
+  .topbar-title {
+    font-size: 17px;
+    font-weight: 500;
+    letter-spacing: 0.02em;
+    color: #ffffff;
+  }
+
+  .bt-badge {
+    display: flex;
+    align-items: center;
+    gap: 5px;
+    background: #0f2540;
+    border: 1px solid #1a4a7a;
+    border-radius: 20px;
+    padding: 4px 10px;
+    font-size: 11px;
+    color: #5ab0ff;
+    cursor: pointer;
+    transition: background 0.15s;
+  }
+  .bt-badge:hover { background: #142e52; }
+  .bt-dot { width: 6px; height: 6px; border-radius: 50%; background: #5ab0ff; }
+  .bt-dot.connected { background: #4ade80; box-shadow: 0 0 6px #4ade8066; }
+
+  .mode-switcher {
+    display: flex;
+    margin: 12px;
+    background: #111825;
+    border-radius: 10px;
+    padding: 3px;
+    border: 1px solid #1e2a3a;
+  }
+  .mode-btn {
+    flex: 1;
+    padding: 9px;
+    border: none;
+    background: transparent;
+    color: #7a8a9a;
+    font-size: 13px;
+    font-weight: 500;
+    border-radius: 8px;
+    cursor: pointer;
+    transition: all 0.2s;
+    font-family: var(--font-sans);
+  }
+  .mode-btn.active {
+    background: #1a3a5c;
+    color: #5ab0ff;
+  }
+
+  .inning-bar {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 8px 14px;
+    background: #0d1520;
+    border-bottom: 1px solid #1e2a3a;
+    border-top: 1px solid #1e2a3a;
+    font-size: 12px;
+    color: #7a8a9a;
+  }
+  .inning-val { color: #e8eaf0; font-weight: 500; }
+  .count-badge {
+    background: #111825;
+    border: 1px solid #1e2a3a;
+    border-radius: 6px;
+    padding: 3px 8px;
+    font-size: 12px;
+    color: #e8eaf0;
+  }
+  .inning-ctrl { display: flex; align-items: center; gap: 6px; }
+  .inning-ctrl button {
+    width: 22px; height: 22px;
+    border: 1px solid #1e2a3a;
+    background: #111825;
+    color: #e8eaf0;
+    border-radius: 5px;
+    font-size: 14px;
+    cursor: pointer;
+    display: flex; align-items: center; justify-content: center;
+    font-family: var(--font-sans);
+  }
+  .inning-ctrl button:hover { background: #1e2a3a; }
+
+  .panel { padding: 10px 12px; flex: 1; }
+
+  .section-label {
+    font-size: 10px;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    color: #4a5a6a;
+    margin-bottom: 8px;
+    font-weight: 500;
+  }
+
+  .pitch-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr 1fr;
+    gap: 8px;
+    margin-bottom: 14px;
+  }
+
+  .pitch-btn {
+    padding: 14px 6px;
+    border: 1.5px solid #1e2a3a;
+    background: #0f1a28;
+    border-radius: 10px;
+    color: #c8d4e0;
+    font-size: 13px;
+    font-weight: 500;
+    cursor: pointer;
+    text-align: center;
+    transition: all 0.15s;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 6px;
+    font-family: var(--font-sans);
+    line-height: 1.2;
+  }
+  .pitch-btn .pitch-icon { font-size: 20px; }
+  .pitch-btn:hover { border-color: #2a4a6a; background: #131f30; }
+  .pitch-btn.selected {
+    border-color: #5ab0ff;
+    background: #0f2540;
+    color: #5ab0ff;
+  }
+  .pitch-btn.fired {
+    border-color: #4ade80;
+    background: #0a2018;
+    color: #4ade80;
+    transform: scale(0.97);
+  }
+
+  .location-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 6px;
+    margin-bottom: 14px;
+    aspect-ratio: 1;
+    max-width: 220px;
+    margin-left: auto;
+    margin-right: auto;
+  }
+
+  .loc-btn {
+    border: 1.5px solid #1e2a3a;
+    background: #0f1a28;
+    border-radius: 8px;
+    color: #7a8a9a;
+    font-size: 10px;
+    cursor: pointer;
+    transition: all 0.15s;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-family: var(--font-sans);
+    font-weight: 500;
+    min-height: 52px;
+  }
+  .loc-btn:hover { border-color: #2a4a6a; }
+  .loc-btn.selected {
+    border-color: #5ab0ff;
+    background: #0f2540;
+    color: #5ab0ff;
+  }
+  .loc-btn.center-zone {
+    border-color: #2a3a4a;
+    color: #5a6a7a;
+    font-size: 9px;
+  }
+  .loc-btn.fired {
+    border-color: #4ade80;
+    background: #0a2018;
+    color: #4ade80;
+  }
+
+  .fire-btn {
+    width: 100%;
+    padding: 16px;
+    background: #1a3a5c;
+    border: 1.5px solid #2a5a8a;
+    border-radius: 12px;
+    color: #5ab0ff;
+    font-size: 16px;
+    font-weight: 500;
+    cursor: pointer;
+    margin-bottom: 12px;
+    transition: all 0.15s;
+    font-family: var(--font-sans);
+    letter-spacing: 0.02em;
+  }
+  .fire-btn:hover { background: #1e4470; border-color: #3a6a9a; }
+  .fire-btn:active { transform: scale(0.98); }
+  .fire-btn.fired { background: #0a2018; border-color: #4ade80; color: #4ade80; }
+  .fire-btn:disabled { opacity: 0.4; cursor: default; }
+
+  .log {
+    background: #0a0f1a;
+    border: 1px solid #1e2a3a;
+    border-radius: 10px;
+    overflow: hidden;
+  }
+  .log-header {
+    padding: 8px 12px;
+    background: #0d1520;
+    border-bottom: 1px solid #1e2a3a;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+  }
+  .log-header span { font-size: 11px; color: #4a5a6a; letter-spacing: 0.1em; text-transform: uppercase; }
+  .log-clear { font-size: 11px; color: #5ab0ff; cursor: pointer; background: none; border: none; font-family: var(--font-sans); }
+  .log-items { max-height: 130px; overflow-y: auto; }
+  .log-item {
+    padding: 7px 12px;
+    border-bottom: 1px solid #0f1520;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    font-size: 12px;
+  }
+  .log-item:last-child { border-bottom: none; }
+  .log-pitch { color: #5ab0ff; font-weight: 500; }
+  .log-loc { color: #7a8a9a; }
+  .log-meta { color: #3a4a5a; font-size: 10px; }
+
+  .receiver-panel {
+    display: none;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    padding: 32px 16px;
+    gap: 20px;
+    text-align: center;
+  }
+  .receiver-panel.active { display: flex; }
+
+  .recv-circle {
+    width: 140px;
+    height: 140px;
+    border-radius: 50%;
+    border: 2px solid #1e2a3a;
+    background: #0d1520;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 4px;
+    transition: all 0.3s;
+  }
+  .recv-circle.listening {
+    border-color: #5ab0ff;
+    box-shadow: 0 0 0 8px #5ab0ff15, 0 0 0 16px #5ab0ff08;
+  }
+  .recv-circle.speaking {
+    border-color: #4ade80;
+    box-shadow: 0 0 0 8px #4ade8015, 0 0 0 16px #4ade8008;
+  }
+  .recv-label { font-size: 11px; color: #4a5a6a; text-transform: uppercase; letter-spacing: 0.1em; }
+  .recv-pitch { font-size: 22px; font-weight: 500; color: #ffffff; }
+  .recv-loc { font-size: 14px; color: #7a8a9a; }
+
+  .vol-row {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    width: 100%;
+    padding: 0 8px;
+  }
+  .vol-row label { font-size: 12px; color: #4a5a6a; white-space: nowrap; }
+  .vol-row input[type=range] { flex: 1; accent-color: #5ab0ff; }
+  .vol-val { font-size: 12px; color: #7a8a9a; min-width: 24px; text-align: right; }
+
+  .speaking-anim {
+    display: flex;
+    gap: 3px;
+    align-items: center;
+    height: 24px;
+  }
+  .speaking-anim span {
+    display: inline-block;
+    width: 4px;
+    background: #4ade80;
+    border-radius: 2px;
+    animation: none;
+  }
+  .speaking-anim.active span { animation: wavebar 0.8s ease-in-out infinite; }
+  .speaking-anim span:nth-child(2) { animation-delay: 0.1s; }
+  .speaking-anim span:nth-child(3) { animation-delay: 0.2s; }
+  .speaking-anim span:nth-child(4) { animation-delay: 0.1s; }
+
+  @keyframes wavebar {
+    0%, 100% { height: 4px; }
+    50% { height: 20px; }
+  }
+
+  .settings-row {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 10px 12px;
+    background: #0d1520;
+    border: 1px solid #1e2a3a;
+    border-radius: 10px;
+    margin-bottom: 10px;
+    cursor: pointer;
+  }
+  .settings-row span { font-size: 13px; color: #c8d4e0; }
+  .settings-row .val { color: #5ab0ff; font-size: 12px; }
+
+  .toggle {
+    width: 36px; height: 20px;
+    background: #1e2a3a;
+    border-radius: 10px;
+    position: relative;
+    cursor: pointer;
+    transition: background 0.2s;
+    border: none;
+    flex-shrink: 0;
+  }
+  .toggle.on { background: #1a4a8a; }
+  .toggle::after {
+    content: '';
+    position: absolute;
+    top: 3px; left: 3px;
+    width: 14px; height: 14px;
+    background: #7a8a9a;
+    border-radius: 50%;
+    transition: transform 0.2s, background 0.2s;
+  }
+  .toggle.on::after { transform: translateX(16px); background: #5ab0ff; }
+
+  .empty-log { padding: 16px; text-align: center; font-size: 12px; color: #2a3a4a; }
+
+  .tab-bar {
+    display: flex;
+    background: #0d1520;
+    border-top: 1px solid #1e2a3a;
+  }
+  .tab-item {
+    flex: 1;
+    padding: 10px 6px 8px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 3px;
+    cursor: pointer;
+    font-size: 9px;
+    color: #4a5a6a;
+    letter-spacing: 0.05em;
+    text-transform: uppercase;
+    border: none;
+    background: transparent;
+    font-family: var(--font-sans);
+    transition: color 0.15s;
+  }
+  .tab-item.active { color: #5ab0ff; }
+  .tab-icon { font-size: 18px; }
+</style>
+
+<div class="app" id="app">
+  <div class="topbar">
+    <div class="topbar-title">⚾ PitchCom</div>
+    <div class="bt-badge" id="btBadge" onclick="toggleBT()">
+      <div class="bt-dot connected" id="btDot"></div>
+      <span id="btLabel">BT Connected</span>
+    </div>
+  </div>
+
+  <div class="mode-switcher">
+    <button class="mode-btn active" id="btnCatcher" onclick="setMode('catcher')">Catcher (TX)</button>
+    <button class="mode-btn" id="btnPitcher" onclick="setMode('pitcher')">Pitcher (RX)</button>
+  </div>
+
+  <div class="inning-bar">
+    <div class="inning-ctrl">
+      <span style="color:#4a5a6a;">Inning</span>
+      <button onclick="adjInning(-1)">-</button>
+      <span class="inning-val" id="inningVal">1</span>
+      <button onclick="adjInning(1)">+</button>
+    </div>
+    <div style="display:flex;gap:8px;align-items:center;">
+      <span class="count-badge" id="countBadge">0-0</span>
+      <button style="font-size:10px;padding:3px 8px;border:1px solid #1e2a3a;background:#111825;color:#7a8a9a;border-radius:5px;cursor:pointer;font-family:var(--font-sans);" onclick="resetCount()">Reset</button>
+    </div>
+    <div>
+      <span style="color:#4a5a6a;font-size:11px;">Pitch #<span class="inning-val" id="pitchNum">0</span></span>
+    </div>
+  </div>
+
+  <div id="catcherPanel" class="panel">
+    <div class="section-label">Pitch type</div>
+    <div class="pitch-grid" id="pitchGrid">
+      <button class="pitch-btn" onclick="selectPitch('Fastball','🔴')"><span class="pitch-icon">🔴</span>Fastball</button>
+      <button class="pitch-btn" onclick="selectPitch('Two-seam','🟠')"><span class="pitch-icon">🟠</span>Two-seam</button>
+      <button class="pitch-btn" onclick="selectPitch('Cutter','🟡')"><span class="pitch-icon">🟡</span>Cutter</button>
+      <button class="pitch-btn" onclick="selectPitch('Curveball','🔵')"><span class="pitch-icon">🔵</span>Curveball</button>
+      <button class="pitch-btn" onclick="selectPitch('Slider','🟣')"><span class="pitch-icon">🟣</span>Slider</button>
+      <button class="pitch-btn" onclick="selectPitch('Changeup','🟢')"><span class="pitch-icon">🟢</span>Changeup</button>
+      <button class="pitch-btn" onclick="selectPitch('Sinker','⚪')"><span class="pitch-icon">⚪</span>Sinker</button>
+      <button class="pitch-btn" onclick="selectPitch('Splitter','🩶')"><span class="pitch-icon">🩶</span>Splitter</button>
+      <button class="pitch-btn" onclick="selectPitch('Knuckleball','🪄')"><span class="pitch-icon">🪄</span>Knuckle</button>
+    </div>
+
+    <div class="section-label">Location (batter's view)</div>
+    <div class="location-grid" id="locGrid">
+      <button class="loc-btn" onclick="selectLoc('Up and in')">Up in</button>
+      <button class="loc-btn" onclick="selectLoc('Up')">Up</button>
+      <button class="loc-btn" onclick="selectLoc('Up and away')">Up away</button>
+      <button class="loc-btn" onclick="selectLoc('In')">In</button>
+      <button class="loc-btn center-zone" onclick="selectLoc('Middle')">Zone</button>
+      <button class="loc-btn" onclick="selectLoc('Away')">Away</button>
+      <button class="loc-btn" onclick="selectLoc('Down and in')">Down in</button>
+      <button class="loc-btn" onclick="selectLoc('Down')">Down</button>
+      <button class="loc-btn" onclick="selectLoc('Down and away')">Down away</button>
+    </div>
+
+    <button class="fire-btn" id="fireBtn" onclick="firePitch()" disabled>Select pitch + location</button>
+
+    <div class="log">
+      <div class="log-header">
+        <span>Pitch log</span>
+        <button class="log-clear" onclick="clearLog()">Clear</button>
+      </div>
+      <div class="log-items" id="logItems">
+        <div class="empty-log">No pitches called yet</div>
+      </div>
+    </div>
+  </div>
+
+  <div id="pitcherPanel" class="receiver-panel">
+    <div style="font-size:11px;color:#4a5a6a;text-transform:uppercase;letter-spacing:0.1em;">Receiving</div>
+    <div class="recv-circle" id="recvCircle">
+      <div class="speaking-anim" id="speakAnim">
+        <span></span><span></span><span></span><span></span>
+      </div>
+      <div class="recv-label" id="recvStatus">Waiting...</div>
+      <div class="recv-pitch" id="recvPitch">—</div>
+      <div class="recv-loc" id="recvLoc"></div>
+    </div>
+    <div class="vol-row">
+      <label>Volume</label>
+      <input type="range" min="0" max="1" step="0.05" value="1" id="volSlider" oninput="setVol(this.value)">
+      <span class="vol-val" id="volVal">20</span>
+    </div>
+    <div class="settings-row" onclick="toggleRepeat()">
+      <span>Repeat call</span>
+      <button class="toggle" id="repeatToggle"></button>
+    </div>
+    <div class="settings-row" onclick="cycleLang()">
+      <span>Language</span>
+      <span class="val" id="langVal">English</span>
+    </div>
+  </div>
+
+  <div class="tab-bar" id="tabBar" style="display:none;">
+    <button class="tab-item active" onclick="setTab('signal')"><span class="tab-icon">📡</span>Signal</button>
+    <button class="tab-item" onclick="setTab('settings')"><span class="tab-icon">⚙️</span>Settings</button>
+  </div>
+</div>
+
+<script>
+  let selectedPitch = null;
+  let selectedLoc = null;
+  let pitchLog = [];
+  let inning = 1;
+  let balls = 0, strikes = 0, pitchCount = 0;
+  let volume = 1;
+  let repeatCall = false;
+  let btConnected = true;
+  let currentMode = 'catcher';
+  let langs = ['English', 'Spanish', 'Japanese'];
+  let langIdx = 0;
+  let synth = window.speechSynthesis;
+  let lastCall = null;
+
+  function setMode(mode) {
+    currentMode = mode;
+    document.getElementById('btnCatcher').classList.toggle('active', mode === 'catcher');
+    document.getElementById('btnPitcher').classList.toggle('active', mode === 'pitcher');
+    document.getElementById('catcherPanel').style.display = mode === 'catcher' ? 'block' : 'none';
+    document.getElementById('pitcherPanel').classList.toggle('active', mode === 'pitcher');
+  }
+
+  function selectPitch(name, icon) {
+    selectedPitch = name;
+    document.querySelectorAll('.pitch-btn').forEach(b => b.classList.remove('selected'));
+    event.currentTarget.classList.add('selected');
+    updateFireBtn();
+  }
+
+  function selectLoc(loc) {
+    selectedLoc = loc;
+    document.querySelectorAll('.loc-btn').forEach(b => b.classList.remove('selected'));
+    event.currentTarget.classList.add('selected');
+    updateFireBtn();
+  }
+
+  function updateFireBtn() {
+    const btn = document.getElementById('fireBtn');
+    if (selectedPitch && selectedLoc) {
+      btn.disabled = false;
+      btn.textContent = '▶ Call: ' + selectedPitch + ' — ' + selectedLoc;
+    } else if (selectedPitch) {
+      btn.disabled = true;
+      btn.textContent = 'Select location...';
+    } else {
+      btn.disabled = true;
+      btn.textContent = 'Select pitch + location';
+    }
+  }
+
+  function firePitch() {
+    if (!selectedPitch || !selectedLoc) return;
+    pitchCount++;
+    lastCall = { pitch: selectedPitch, loc: selectedLoc, inning, count: balls + '-' + strikes };
+
+    const btn = document.getElementById('fireBtn');
+    btn.classList.add('fired');
+    btn.textContent = '✓ Transmitted!';
+
+    document.querySelectorAll('.pitch-btn.selected').forEach(b => { b.classList.remove('selected'); b.classList.add('fired'); });
+    document.querySelectorAll('.loc-btn.selected').forEach(b => { b.classList.remove('selected'); b.classList.add('fired'); });
+
+    speakCall(selectedPitch, selectedLoc);
+
+    const now = new Date();
+    const timeStr = now.getHours().toString().padStart(2,'0') + ':' + now.getMinutes().toString().padStart(2,'0') + ':' + now.getSeconds().toString().padStart(2,'0');
+    pitchLog.unshift({ pitch: selectedPitch, loc: selectedLoc, inning, time: timeStr, num: pitchCount });
+    renderLog();
+    document.getElementById('pitchNum').textContent = pitchCount;
+
+    updateReceiverPanel(selectedPitch, selectedLoc);
+
+    setTimeout(() => {
+      btn.classList.remove('fired');
+      document.querySelectorAll('.pitch-btn.fired').forEach(b => b.classList.remove('fired'));
+      document.querySelectorAll('.loc-btn.fired').forEach(b => b.classList.remove('fired'));
+      selectedPitch = null;
+      selectedLoc = null;
+      updateFireBtn();
+    }, 1800);
+  }
+
+  function updateReceiverPanel(pitch, loc) {
+    document.getElementById('recvPitch').textContent = pitch;
+    document.getElementById('recvLoc').textContent = loc;
+    const circle = document.getElementById('recvCircle');
+    const anim = document.getElementById('speakAnim');
+    const status = document.getElementById('recvStatus');
+    circle.className = 'recv-circle speaking';
+    anim.classList.add('active');
+    status.textContent = 'Speaking';
+    setTimeout(() => {
+      circle.className = 'recv-circle listening';
+      anim.classList.remove('active');
+      status.textContent = 'Listening';
+    }, 2800);
+  }
+
+  function speakCall(pitch, loc) {
+    if (!synth) return;
+    synth.cancel();
+    const text = buildSpeechText(pitch, loc);
+    const utt = new SpeechSynthesisUtterance(text);
+    utt.volume = volume;
+    utt.rate = 1.05;
+    utt.pitch = 1;
+    utt.lang = langIdx === 1 ? 'es-ES' : langIdx === 2 ? 'ja-JP' : 'en-US';
+
+    const voices = synth.getVoices();
+    if (voices.length > 0) {
+      const preferred = voices.find(v => v.lang === utt.lang) || voices.find(v => v.lang.startsWith('en')) || voices[0];
+      if (preferred) utt.voice = preferred;
+    }
+    synth.speak(utt);
+
+    if (repeatCall) {
+      setTimeout(() => {
+        if (synth) {
+          const utt2 = new SpeechSynthesisUtterance(text);
+          utt2.volume = volume;
+          utt2.rate = 1.05;
+          utt2.lang = utt.lang;
+          if (utt.voice) utt2.voice = utt.voice;
+          synth.speak(utt2);
+        }
+      }, 2200);
+    }
+  }
+
+  function buildSpeechText(pitch, loc) {
+    if (langIdx === 1) {
+      const pitchEs = { 'Fastball': 'recta', 'Two-seam': 'recta de dos costuras', 'Cutter': 'cortada', 'Curveball': 'curva', 'Slider': 'slider', 'Changeup': 'cambio', 'Sinker': 'sinker', 'Splitter': 'splitter', 'Knuckleball': 'nudillo' };
+      const locEs = { 'Up and in': 'arriba adentro', 'Up': 'arriba', 'Up and away': 'arriba afuera', 'In': 'adentro', 'Middle': 'al centro', 'Away': 'afuera', 'Down and in': 'abajo adentro', 'Down': 'abajo', 'Down and away': 'abajo afuera' };
+      return (pitchEs[pitch] || pitch) + ', ' + (locEs[loc] || loc);
+    }
+    return pitch + ', ' + loc;
+  }
+
+  function renderLog() {
+    const el = document.getElementById('logItems');
+    if (pitchLog.length === 0) {
+      el.innerHTML = '<div class="empty-log">No pitches called yet</div>';
+      return;
+    }
+    el.innerHTML = pitchLog.slice(0, 20).map(p =>
+      `<div class="log-item">
+        <span class="log-pitch">${p.num}. ${p.pitch}</span>
+        <span class="log-loc">${p.loc}</span>
+        <span class="log-meta">Inn ${p.inning} · ${p.time}</span>
+      </div>`
+    ).join('');
+  }
+
+  function clearLog() {
+    pitchLog = [];
+    pitchCount = 0;
+    document.getElementById('pitchNum').textContent = 0;
+    renderLog();
+  }
+
+  function adjInning(d) {
+    inning = Math.max(1, Math.min(20, inning + d));
+    document.getElementById('inningVal').textContent = inning;
+  }
+
+  function resetCount() {
+    balls = 0; strikes = 0;
+    document.getElementById('countBadge').textContent = '0-0';
+  }
+
+  function toggleBT() {
+    btConnected = !btConnected;
+    const dot = document.getElementById('btDot');
+    const label = document.getElementById('btLabel');
+    dot.classList.toggle('connected', btConnected);
+    label.textContent = btConnected ? 'BT Connected' : 'BT Off';
+    if (btConnected) {
+      const utt = new SpeechSynthesisUtterance('Bluetooth connected. PitchCom ready.');
+      utt.volume = volume;
+      synth && synth.speak(utt);
+    }
+  }
+
+  function setVol(val) {
+    volume = parseFloat(val);
+    document.getElementById('volVal').textContent = Math.round(val * 20);
+  }
+
+  function toggleRepeat() {
+    repeatCall = !repeatCall;
+    document.getElementById('repeatToggle').classList.toggle('on', repeatCall);
+  }
+
+  function cycleLang() {
+    langIdx = (langIdx + 1) % langs.length;
+    document.getElementById('langVal').textContent = langs[langIdx];
+  }
+
+  synth.onvoiceschanged = () => { synth.getVoices(); };
+</script>
