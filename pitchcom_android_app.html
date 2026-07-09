@@ -1,7 +1,10 @@
-
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=0">
+<link rel="stylesheet" href="style.css">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
 <style>
-  * { box-sizing: border-box; margin: 0; padding: 0; }
-  body { font-family: var(--font-sans); }
+  :root { --font-sans: 'Inter', sans-serif; }
+  * { box-sizing: border-box; margin: 0; padding: 0; -webkit-tap-highlight-color: transparent; }
+  body { font-family: var(--font-sans); background: #000; }
 
   .app {
     max-width: 420px;
@@ -429,6 +432,7 @@
       <button class="pitch-btn" onclick="selectPitch('Splitter','🩶')"><span class="pitch-icon">🩶</span>Splitter</button>
       <button class="pitch-btn" onclick="selectPitch('Knuckleball','🪄')"><span class="pitch-icon">🪄</span>Knuckle</button>
     </div>
+<button class="add-pitch-btn" onclick="openAddPitchModal()">+ Add Pitch</button>
 
     <div class="section-label">Location (batter's view)</div>
     <div class="location-grid" id="locGrid">
@@ -444,6 +448,15 @@
     </div>
 
     <button class="fire-btn" id="fireBtn" onclick="firePitch()" disabled>Select pitch + location</button>
+<div class="modal" id="addPitchModal" style="display:none;">
+  <div class="modal-content">
+    <h3>Add Custom Pitch</h3>
+    <input type="text" id="customPitchName" placeholder="Pitch name"/>
+    <input type="text" id="customPitchIcon" placeholder="Emoji/icon"/>
+    <button onclick="saveCustomPitch()">Save</button>
+    <button onclick="closeAddPitchModal()">Cancel</button>
+  </div>
+</div>
 
     <div class="log">
       <div class="log-header">
@@ -685,6 +698,10 @@
     langIdx = (langIdx + 1) % langs.length;
     document.getElementById('langVal').textContent = langs[langIdx];
   }
-
+function openAddPitchModal(){ document.getElementById('addPitchModal').style.display='flex'; }
+function closeAddPitchModal(){ document.getElementById('addPitchModal').style.display='none'; }
+function saveCustomPitch(){ const name=document.getElementById('customPitchName').value.trim(); const icon=document.getElementById('customPitchIcon').value.trim()||'⚽'; if(!name) return; const btn=document.createElement('button'); btn.className='pitch-btn'; btn.onclick=function(){ selectPitch(name, icon); }; btn.innerHTML=`<span class="pitch-icon">${icon}</span>${name}`; document.getElementById('pitchGrid').appendChild(btn); const custom=JSON.parse(localStorage.getItem('customPitches')||'[]'); custom.push({name, icon}); localStorage.setItem('customPitches', JSON.stringify(custom)); closeAddPitchModal(); }
+function loadCustomPitches(){ const custom=JSON.parse(localStorage.getItem('customPitches')||'[]'); const grid=document.getElementById('pitchGrid'); custom.forEach(p=>{ const btn=document.createElement('button'); btn.className='pitch-btn'; btn.onclick=function(){ selectPitch(p.name, p.icon); }; btn.innerHTML=`<span class="pitch-icon">${p.icon}</span>${p.name}`; grid.appendChild(btn); }); }
+window.addEventListener('DOMContentLoaded', loadCustomPitches);
   synth.onvoiceschanged = () => { synth.getVoices(); };
 </script>
